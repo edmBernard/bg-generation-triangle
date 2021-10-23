@@ -34,6 +34,13 @@ struct RGB {
   int r;
   int g;
   int b;
+
+  RGB(int r, int g, int b)
+      : r(r), g(g), b(b) {
+  }
+  RGB(uint32_t hexColor)
+      : r((hexColor & 0xFF0000) >> 16), g((hexColor & 0x00FF00) >> 8), b(hexColor & 0x0000FF) {
+  }
 };
 
 struct Fill {
@@ -44,9 +51,11 @@ struct Fill {
   Fill(int r, int g, int b)
       : r(r), g(g), b(b) {
   }
-
   Fill(RGB rgb)
       : r(rgb.r), g(rgb.g), b(rgb.b) {
+  }
+  Fill(uint32_t hexColor)
+      : Fill(RGB(hexColor)) {
   }
 };
 
@@ -59,9 +68,11 @@ struct Strockes {
   Strockes(int r, int g, int b, float width)
       : r(r), g(g), b(b), width(width) {
   }
-
   Strockes(RGB rgb, float width)
       : r(rgb.r), g(rgb.g), b(rgb.b), width(width) {
+  }
+  Strockes(uint32_t hexColor, float width)
+      : Strockes(RGB(hexColor), width) {
   }
 };
 
@@ -70,27 +81,27 @@ std::vector<RGB> getColorPalette(int index) {
   case 0:
     // blue but too light
     return {
-        {0x73, 0xF3, 0xFF},
-        {0x60, 0xBC, 0xEB},
-        {0x48, 0x89, 0xCF},
-        {0x29, 0x59, 0xA6},
-        {0x0B, 0x29, 0x66}};
+        {0x73F3FF},
+        {0x60BCEB},
+        {0x4889CF},
+        {0x2959A6},
+        {0x0B2966}};
   case 1:
     // nice blue not enough saturated / dark
     return {
-        {0x60, 0xCD, 0xDB},
-        {0x42, 0x81, 0xA1},
-        {0x2D, 0x55, 0x80},
-        {0x16, 0x30, 0x59},
-        {0x06, 0x17, 0x38}};
+        {0x60CDDB},
+        {0x4281A1},
+        {0x2D5580},
+        {0x163059},
+        {0x061738}};
   case 2:
     // orange
     return {
-        {0xDB, 0x56, 0x00},
-        {0x8C, 0x29, 0x01},
-        {0x69, 0x15, 0x00},
-        {0x42, 0x05, 0x00},
-        {0x26, 0x00, 0x06}};
+        {0xDB5600},
+        {0x8C2901},
+        {0x691500},
+        {0x420500},
+        {0x260006}};
   case 3:
     // red
     return {
