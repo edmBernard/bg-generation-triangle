@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) try {
   // Tiling initialisation
 
   for (int i = 0, sign = -1; i < 6; ++i, sign *= -1) {
-    const float phi1 = (2 * i - sign) * pi / 6;
-    const float phi2 = (2 * i + sign) * pi / 6;
+    const float phi1 = (2 * i - sign) * pi / 6 + pi / 6;
+    const float phi2 = (2 * i + sign) * pi / 6 + pi / 6;
 
     tiling.emplace_back(
         TriangleKind::kDart,

@@ -146,6 +146,27 @@ std::string to_path(
       << fmt::format("<rect height='100%' width='100%' fill='rgb({},{},{})'/>\n", background.r, background.g, background.b)
       << "<g id='surface1'>\n";
 
+  // orange
+  // const RGB red1 {0xDB, 0x56, 0x00};
+  // const RGB red2 {0x8C, 0x29, 0x01};
+  // const RGB red3 {0x69, 0x15, 0x00};
+  // const RGB red4 {0x42, 0x05, 0x00};
+  // const RGB red5 {0x26, 0x00, 0x06};
+
+  // nice blue not enough saturated / dark
+  // const RGB red1 {0x60, 0xCD, 0xDB};
+  // const RGB red2 {0x42, 0x81, 0xA1};
+  // const RGB red3 {0x2D, 0x55, 0x80};
+  // const RGB red4 {0x16, 0x30, 0x59};
+  // const RGB red5 {0x06, 0x17, 0x38};
+
+  // blue but too light
+  // const RGB red1 {0x73, 0xF3, 0xFF};
+  // const RGB red2 {0x60, 0xBC, 0xEB};
+  // const RGB red3 {0x48, 0x89, 0xCF};
+  // const RGB red4 {0x29, 0x59, 0xA6};
+  // const RGB red5 {0x0B, 0x29, 0x66};
+
   const RGB red1 {222, 10, 20};
   const RGB red2 {171, 10, 20};
   const RGB red3 {113, 10, 20};
