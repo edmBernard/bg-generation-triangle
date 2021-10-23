@@ -9,7 +9,7 @@
 //
 
 #include <geometry.hpp>
-#include <penrose.hpp>
+#include <triangle.hpp>
 #include <save.hpp>
 
 #include <cxxopts.hpp>
@@ -34,12 +34,13 @@ int main(int argc, char *argv[]) try {
     ("h,help", "Print help")
     ("l,level", "Number of subdivision done", cxxopts::value<int>()->default_value("11"))
     ("o,output", "Output filename (.svg)", cxxopts::value<std::string>())
-    ("rhombus", "Use Rhombus (P3) form otherwise it use Kite and Dart (P2)", cxxopts::value<bool>())
-    ("step", "Step of the 2 color", cxxopts::value<int>()->default_value("0"))
-    ("threshold", "Threshold for holes [0, 10] (0: no holes)", cxxopts::value<int>()->default_value("7"))
+    ("angle", "Angle of the pattern Pi/X)", cxxopts::value<int>()->default_value("0"))
+    ("color", "Color palette (0: blue1, 1:blue2, 2:red, 3:orange)", cxxopts::value<int>()->default_value("0"))
+    ("threshold", "Threshold for holes [0, 10] (0: no holes)", cxxopts::value<int>()->default_value("9"))
+    ("strokes", "Draw Strokes", cxxopts::value<bool>())
     ;
   // clang-format on
-  options.parse_positional({"output", "level", "step"});
+  options.parse_positional({"output", "level", "color"});
   auto clo = options.parse(argc, argv);
 
   if (clo.count("help")) {
@@ -53,8 +54,10 @@ int main(int argc, char *argv[]) try {
   }
 
   const int level = clo["level"].as<int>();
-  const int step = clo["step"].as<int>();
   const int threshold = clo["threshold"].as<int>();
+  const int color = clo["color"].as<int>();
+  const int angle = clo["angle"].as<int>();
+  const bool strokes = clo.count("strokes");
   const std::string filename = clo["output"].as<std::string>();
 
   // =================================================================================================
@@ -72,8 +75,8 @@ int main(int argc, char *argv[]) try {
   // Tiling initialisation
 
   for (int i = 0, sign = -1; i < 6; ++i, sign *= -1) {
-    const float phi1 = (2 * i - sign) * pi / 6 + pi / 6;
-    const float phi2 = (2 * i + sign) * pi / 6 + pi / 6;
+    const float phi1 = (2 * i - sign) * pi / 6 + (angle == 0 ? 0 : pi / angle);
+    const float phi2 = (2 * i + sign) * pi / 6 + (angle == 0 ? 0 : pi / angle);
 
     tiling.emplace_back(
         TriangleKind::kDart,
@@ -90,10 +93,7 @@ int main(int argc, char *argv[]) try {
   setRandomFlag(tiling);
   setRandomFlag(smallTiling);
 
-  if (!svg::saveTiling(filename, tiling, smallTiling, canvasSize,
-                       svg::RGB{255, 140, 140}, svg::RGB{100, 70, 70},
-                       svg::RGB{30, 30, 140}, svg::RGB{30, 140, 30},
-                       svg::RGB{30, 30, 30}, 9)) {
+  if (!svg::saveTiling(filename, tiling, smallTiling, canvasSize, svg::getColorPalette(color), strokes, threshold)) {
     spdlog::error("Failed to save in file");
     return EXIT_FAILURE;
   }
