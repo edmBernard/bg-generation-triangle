@@ -48,7 +48,7 @@ jobs:
     - name: build
       run: cmake --build . --config Release
     - name: run triangle
-      run: ./Artifact/bg-generation-triangle Artifact/dart_11.svg 7
+      run: ./Artifact/bg-generation-triangle Artifact/red_triangle.svg 6 3 --strokes --angle 6 --threshold 5
     - uses: actions/upload-artifact@v1
       with:
         name: bg-generation-triangle-${{ matrix.config.triplet }}
