@@ -1,5 +1,5 @@
 //
-//  https://github.com/edmBernard/bg-generation-penrose
+//  https://github.com/edmBernard/bg-generation-triangle
 //
 //  Created by Erwan BERNARD on 11/09/2021.
 //
@@ -63,23 +63,23 @@ int main(int argc, char *argv[]) try {
   // =================================================================================================
   // Code
 
-  using namespace penrose;
+  using namespace draw;
 
   auto start_temp = std::chrono::high_resolution_clock::now();
 
-  std::vector<PenroseTriangle> tiling;
+  std::vector<ColoredTriangle> tiling;
 
   const int canvasSize = 2000;
   const float radius = canvasSize;
   const Point center = canvasSize / 2.f * Point(1, 1);
-  // Tiling initialisation
 
+  // Tiling initialisation
   for (int i = 0, sign = -1; i < 6; ++i, sign *= -1) {
     const float phi1 = (2 * i - sign) * pi / 6 + (angle == 0 ? 0 : pi / angle);
     const float phi2 = (2 * i + sign) * pi / 6 + (angle == 0 ? 0 : pi / angle);
 
     tiling.emplace_back(
-        TriangleKind::kDart,
+        TriangleKind::kBorder,
         radius * Point(cos(phi1), sin(phi1)) + center,
         Point(0, 0) + center,
         radius * Point(cos(phi2), sin(phi2)) + center);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) try {
   for (int l = 0; l < level; ++l) {
     tiling = deflate(tiling);
   }
-  std::vector<PenroseTriangle> smallTiling = deflate(tiling);
+  std::vector<ColoredTriangle> smallTiling = deflate(tiling);
 
   setRandomFlag(tiling);
   setRandomFlag(smallTiling);

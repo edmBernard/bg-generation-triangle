@@ -1,5 +1,5 @@
 //
-//  https://github.com/edmBernard/bg-generation-penrose
+//  https://github.com/edmBernard/bg-generation-triangle
 //
 //  Created by Erwan BERNARD on 11/09/2021.
 //

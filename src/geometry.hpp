@@ -1,5 +1,5 @@
 //
-//  https://github.com/edmBernard/bg-generation-penrose
+//  https://github.com/edmBernard/bg-generation-triangle
 //
 //  Created by Erwan BERNARD on 11/09/2021.
 //
@@ -16,6 +16,7 @@
 #include <optional>
 #include <string>
 
+constexpr float pi = 3.14159265358979f;
 constexpr float epsilon = 0.1f; // use for the comparison between Point
 
 struct Point {
