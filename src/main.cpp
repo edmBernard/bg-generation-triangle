@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) try {
     ("h,help", "Print help")
     ("l,level", "Number of subdivision done", cxxopts::value<int>()->default_value("11"))
     ("o,output", "Output filename (.svg)", cxxopts::value<std::string>())
+    ("colorBegin", "First color in hex format", cxxopts::value<std::string>())
+    ("colorEnd", "Last color in hex format", cxxopts::value<std::string>())
     ("angle", "Angle of the pattern Pi/X)", cxxopts::value<int>()->default_value("0"))
     ("color", "Color palette (0: blue1, 1:blue2, 2:red, 3:orange)", cxxopts::value<int>()->default_value("0"))
     ("threshold", "Threshold for holes [0, 10] (0: no holes)", cxxopts::value<int>()->default_value("9"))
@@ -49,13 +51,19 @@ int main(int argc, char *argv[]) try {
   }
   if (!clo.count("output")) {
     spdlog::error("Output filename is required");
-    fmt::print("{}", options.help());
+    return EXIT_FAILURE;
+  }
+  if (clo.count("color") && (clo.count("colorBegin") || clo.count("colorEnd"))) {
+    spdlog::error("Color and ColorBegin or ColorEnd are exclusive");
+    return EXIT_FAILURE;
+  }
+  if (clo.count("colorBegin") ^ clo.count("colorEnd")) {
+    spdlog::error("ColorBegin and ColorEnd should both be specified");
     return EXIT_FAILURE;
   }
 
   const int level = clo["level"].as<int>();
   const int threshold = clo["threshold"].as<int>();
-  const int color = clo["color"].as<int>();
   const int angle = clo["angle"].as<int>();
   const bool strokes = clo.count("strokes");
   const std::string filename = clo["output"].as<std::string>();
@@ -93,7 +101,16 @@ int main(int argc, char *argv[]) try {
   setRandomFlag(tiling);
   setRandomFlag(smallTiling);
 
-  if (!svg::saveTiling(filename, tiling, smallTiling, canvasSize, svg::getColorPalette(color), strokes, threshold)) {
+  std::vector<svg::RGB> colorPalette;
+  if (clo.count("color")) {
+    colorPalette = svg::getColorPalette(clo["color"].as<int>());
+  } else {
+    const uint32_t colorBegin = std::stoul(clo["colorBegin"].as<std::string>(), nullptr, 16);
+    const uint32_t colorEnd = std::stoul(clo["colorEnd"].as<std::string>(), nullptr, 16);
+    colorPalette = svg::getColorPalette(svg::RGB(colorBegin), svg::RGB(colorEnd));
+  }
+
+  if (!svg::saveTiling(filename, tiling, smallTiling, canvasSize, colorPalette, strokes, threshold)) {
     spdlog::error("Failed to save in file");
     return EXIT_FAILURE;
   }

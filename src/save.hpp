@@ -43,6 +43,19 @@ struct RGB {
   }
 };
 
+RGB operator+(const RGB &c1, const RGB &c2) {
+  return {c1.r + c2.r, c1.g + c2.g, c1.b + c2.b};
+}
+RGB operator-(const RGB &c1, const RGB &c2) {
+  return {c1.r - c2.r, c1.g - c2.g, c1.b - c2.b};
+}
+RGB operator*(float value, const RGB &c) {
+  return {int(value * c.r), int(value * c.g), int(value * c.b)};
+}
+float norm(const RGB &c1) {
+  return c1.r * c1.r + c1.g * c1.g + c1.b * c1.b;
+}
+
 struct Fill {
   int r;
   int g;
@@ -112,6 +125,18 @@ std::vector<RGB> getColorPalette(int index) {
         {24, 10, 10}};
   default:
     throw std::runtime_error("Unkown color palette index");
+  };
+};
+
+std::vector<RGB> getColorPalette(RGB colorBegin, RGB colorEnd) {
+  const RGB colorDirection = colorEnd - colorBegin;
+  const float directionNorm = norm(colorDirection);
+  return {
+    colorBegin,
+    colorBegin + (1/4.) * colorDirection,
+    colorBegin + (2/4.) * colorDirection,
+    colorBegin + (3/4.) * colorDirection,
+    colorEnd
   };
 };
 
