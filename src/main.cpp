@@ -10,6 +10,7 @@
 
 #include <geometry.hpp>
 #include <triangle.hpp>
+#include <libsvg.hpp>
 #include <save.hpp>
 
 #include <cxxopts.hpp>
@@ -27,7 +28,7 @@ int main(int argc, char *argv[]) try {
   // =================================================================================================
   // CLI
   cxxopts::Options options(argv[0], "Description");
-  options.positional_help("output [level]").show_positional_help();
+  options.positional_help("output [level] [color]").show_positional_help();
 
   // clang-format off
   options.add_options()
@@ -101,16 +102,16 @@ int main(int argc, char *argv[]) try {
   setRandomFlag(tiling);
   setRandomFlag(smallTiling);
 
-  std::vector<svg::RGB> colorPalette;
+  std::vector<svg::Color> colorPalette;
   if (clo.count("color")) {
-    colorPalette = svg::getColorPalette(clo["color"].as<int>());
+    colorPalette = getColorPalette(clo["color"].as<int>());
   } else {
     const uint32_t colorBegin = std::stoul(clo["colorBegin"].as<std::string>(), nullptr, 16);
     const uint32_t colorEnd = std::stoul(clo["colorEnd"].as<std::string>(), nullptr, 16);
-    colorPalette = svg::getColorPalette(svg::RGB(colorBegin), svg::RGB(colorEnd));
+    colorPalette = getColorPalette(svg::Color(colorBegin), svg::Color(colorEnd));
   }
 
-  if (!svg::saveTiling(filename, tiling, smallTiling, canvasSize, colorPalette, strokes, threshold)) {
+  if (!saveTiling(filename, tiling, smallTiling, canvasSize, colorPalette, strokes, threshold)) {
     spdlog::error("Failed to save in file");
     return EXIT_FAILURE;
   }

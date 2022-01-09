@@ -11,6 +11,7 @@
 #pragma once
 
 #include <geometry.hpp>
+#include <libsvg.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -19,77 +20,8 @@
 #include <string>
 #include <vector>
 
-namespace svg {
-namespace details {
 
-std::string to_path(const Triangle &tr) {
-  return fmt::format("M {} {} L {} {} L {} {} Z", tr.vertices[2].x, tr.vertices[2].y, tr.vertices[0].x, tr.vertices[0].y, tr.vertices[1].x, tr.vertices[1].y);
-}
-std::string to_path(const Quadrilateral &tr) {
-  return fmt::format("M {} {} L {} {} L {} {} L {} {} Z", tr.vertices[0].x, tr.vertices[0].y, tr.vertices[1].x, tr.vertices[1].y, tr.vertices[3].x, tr.vertices[3].y, tr.vertices[2].x, tr.vertices[2].y);
-}
-} // namespace details
-
-struct RGB {
-  int r;
-  int g;
-  int b;
-
-  RGB(int r, int g, int b)
-      : r(r), g(g), b(b) {
-  }
-  RGB(uint32_t hexColor)
-      : r((hexColor & 0xFF0000) >> 16), g((hexColor & 0x00FF00) >> 8), b(hexColor & 0x0000FF) {
-  }
-};
-
-RGB operator+(const RGB &c1, const RGB &c2) {
-  return {c1.r + c2.r, c1.g + c2.g, c1.b + c2.b};
-}
-RGB operator-(const RGB &c1, const RGB &c2) {
-  return {c1.r - c2.r, c1.g - c2.g, c1.b - c2.b};
-}
-RGB operator*(float value, const RGB &c) {
-  return {int(value * c.r), int(value * c.g), int(value * c.b)};
-}
-float norm(const RGB &c1) {
-  return c1.r * c1.r + c1.g * c1.g + c1.b * c1.b;
-}
-
-struct Fill {
-  int r;
-  int g;
-  int b;
-
-  Fill(int r, int g, int b)
-      : r(r), g(g), b(b) {
-  }
-  Fill(RGB rgb)
-      : r(rgb.r), g(rgb.g), b(rgb.b) {
-  }
-  Fill(uint32_t hexColor)
-      : Fill(RGB(hexColor)) {
-  }
-};
-
-struct Strockes {
-  int r;
-  int g;
-  int b;
-  float width;
-
-  Strockes(int r, int g, int b, float width)
-      : r(r), g(g), b(b), width(width) {
-  }
-  Strockes(RGB rgb, float width)
-      : r(rgb.r), g(rgb.g), b(rgb.b), width(width) {
-  }
-  Strockes(uint32_t hexColor, float width)
-      : Strockes(RGB(hexColor), width) {
-  }
-};
-
-std::vector<RGB> getColorPalette(int index) {
+std::vector<svg::Color> getColorPalette(int index) {
   switch (index) {
   case 0:
     // blue but too light
@@ -128,8 +60,9 @@ std::vector<RGB> getColorPalette(int index) {
   };
 };
 
-std::vector<RGB> getColorPalette(RGB colorBegin, RGB colorEnd) {
-  const RGB colorDirection = colorEnd - colorBegin;
+
+std::vector<svg::Color> getColorPalette(svg::Color colorBegin, svg::Color colorEnd) {
+  const svg::Color colorDirection = colorEnd - colorBegin;
   const float directionNorm = norm(colorDirection);
   return {
     colorBegin,
@@ -140,47 +73,26 @@ std::vector<RGB> getColorPalette(RGB colorBegin, RGB colorEnd) {
   };
 };
 
-template <typename T, typename Lambda = std::function<bool(T)>>
-std::string to_path(
-    const std::vector<T> &shape, std::optional<Fill> fill, std::optional<Strockes> strockes, Lambda func = [](const T &) { return true; }) {
-  std::string s_path;
-  for (auto &tr : shape) {
-    if (func(tr)) {
-      s_path += details::to_path(tr) + " ";
-    }
-  }
-  std::string s_fill = fill ? fmt::format("fill:rgb({},{},{})", fill->r, fill->g, fill->b) : "fill:none";
-  std::string s_strockes = strockes ? fmt::format("stroke:rgb({},{},{});stroke-width:{};stroke-linecap:butt;stroke-linejoin:round", strockes->r, strockes->g, strockes->b, strockes->width) : "";
-  return fmt::format("<path style='{};{}' d='{}'></path>\n", s_fill, s_strockes, s_path);
-}
 
 template <typename Geometry>
 [[nodiscard]] bool saveTiling(const std::string &filename,
                               const std::vector<Geometry> &bigGeometry,
                               const std::vector<Geometry> &smallGeometry,
                               int canvasSize,
-                              std::vector<RGB> palette, bool strokes, int threshold) {
+                              std::vector<svg::Color> palette, bool haveStrokes, int threshold) {
 
-  std::ofstream out(filename);
-  if (!out) {
-    spdlog::error("Cannot open output file : {}.", filename);
-    return false;
-  }
+  svg::Document doc(canvasSize, canvasSize, 0x000000);
+
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> distrib(0, 10);
-
-  out << "<svg xmlns='http://www.w3.org/2000/svg' "
-      << fmt::format("height='{size}' width='{size}' viewBox='0 0 {size} {size}'>\n", fmt::arg("size", canvasSize))
-      << fmt::format("<rect height='100%' width='100%' fill='rgb({},{},{})'/>\n", 0, 0, 0)
-      << "<g id='surface1'>\n";
 
   {
     std::vector<int> colorRepartitionBig{2, 2, 2, 2, 3};
     int count = 0;
     for (int c = 0; c < palette.size(); ++c) {
       for (int i = 0; i < colorRepartitionBig[c]; ++i, ++count) {
-        out << to_path(bigGeometry, Fill{palette[c]}, {}, [&](const Geometry &tr) { return tr.flag == count; });
+        doc.addPath(bigGeometry, svg::Fill{palette[c]}, {}, [&](const Geometry &tr) { return tr.flag == count; });
       }
     }
   }
@@ -190,17 +102,15 @@ template <typename Geometry>
     int count = 0;
     for (int c = 0; c < palette.size(); ++c) {
       for (int i = 0; i < colorRepartitionSmall[c]; ++i, ++count) {
-        out << to_path(smallGeometry, Fill{palette[c]}, {}, [&](const Geometry &tr) { return tr.flag == count ? distrib(gen) >= threshold : false; });
+        doc.addPath(smallGeometry, svg::Fill{palette[c]}, {}, [&](const Geometry &tr) { return tr.flag == count ? distrib(gen) >= threshold : false; });
       }
     }
   }
 
-  if (strokes) {
-    const float strokes = std::sqrt(norm(bigGeometry[0].vertices[0] - bigGeometry[0].vertices[1])) / 20.0f;
-    out << to_path(bigGeometry, {}, Strockes{0, 0, 0, strokes});
+  if (haveStrokes) {
+    const float strokeWidth = norm(bigGeometry[0].vertices[0] - bigGeometry[0].vertices[1]) / 20.0f;
+    doc.addPath(bigGeometry, {}, svg::Stroke{{0, 0, 0}, strokeWidth});
   }
-  out << "</g>\n</svg>\n";
-  return true;
-}
 
-} // namespace svg
+  return doc.save(filename);
+}
