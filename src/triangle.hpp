@@ -21,10 +21,20 @@
 namespace draw {
 
 enum class TriangleKind {
-  kCentral,
-  kBorder,
+  Central,
+  Border,
 };
 
+std::string to_string(TriangleKind type) {
+  switch (type) {
+    case TriangleKind::Central:
+      return "Central";
+    case TriangleKind::Border:
+      return "Border";
+  }
+  // msvc Warning
+  return "";
+}
 
 struct ColoredTriangle : Triangle {
   TriangleKind kind;
@@ -37,7 +47,7 @@ struct ColoredTriangle : Triangle {
 };
 
 std::string to_string(const ColoredTriangle &triangle) {
-  return fmt::format("{}, {}, {}, {}", triangle.kind, to_string(triangle.vertices[0]), to_string(triangle.vertices[1]), to_string(triangle.vertices[2]));
+  return fmt::format("{}, {}, {}, {}", to_string(triangle.kind), to_string(triangle.vertices[0]), to_string(triangle.vertices[1]), to_string(triangle.vertices[2]));
 }
 
 std::vector<ColoredTriangle> deflateRegular(const ColoredTriangle &triangle) {
@@ -49,10 +59,10 @@ std::vector<ColoredTriangle> deflateRegular(const ColoredTriangle &triangle) {
   const Point b = B + ((A - B) + (C - B)) / 2.;
   const Point c = C + ((A - C) + (B - C)) / 2.;
   return std::vector<ColoredTriangle>{
-      {TriangleKind::kBorder, A, b, c, triangle.flag},
-      {TriangleKind::kBorder, B, c, a, triangle.flag},
-      {TriangleKind::kBorder, C, a, b, triangle.flag},
-      {TriangleKind::kCentral, a, b, c, triangle.flag}};
+      {TriangleKind::Border, A, b, c, triangle.flag},
+      {TriangleKind::Border, B, c, a, triangle.flag},
+      {TriangleKind::Border, C, a, b, triangle.flag},
+      {TriangleKind::Central, a, b, c, triangle.flag}};
 }
 
 std::vector<ColoredTriangle> deflateRegular(const std::vector<ColoredTriangle> &triangles) {
@@ -82,8 +92,8 @@ std::vector<ColoredTriangle> deflatePleasing(const ColoredTriangle &triangle) {
     const Point D = A + ratio * (B - A);
 
     return std::vector<ColoredTriangle>{
-        {TriangleKind::kBorder, A, D, C, triangle.flag},
-        {TriangleKind::kBorder, B, D, C, triangle.flag}};
+        {TriangleKind::Border, A, D, C, triangle.flag},
+        {TriangleKind::Border, B, D, C, triangle.flag}};
   }
 
   if (AC >= AB && AC >= BC) {
@@ -91,16 +101,16 @@ std::vector<ColoredTriangle> deflatePleasing(const ColoredTriangle &triangle) {
     const Point D = A + ratio * (C - A);
 
     return std::vector<ColoredTriangle>{
-        {TriangleKind::kBorder, A, D, B, triangle.flag},
-        {TriangleKind::kBorder, C, D, B, triangle.flag}};
+        {TriangleKind::Border, A, D, B, triangle.flag},
+        {TriangleKind::Border, C, D, B, triangle.flag}};
   }
 
   if (BC >= AB && BC >= AC) {
     const Point D = B + ratio * (C - B);
 
     return std::vector<ColoredTriangle>{
-        {TriangleKind::kBorder, B, D, A, triangle.flag},
-        {TriangleKind::kBorder, C, D, A, triangle.flag}};
+        {TriangleKind::Border, B, D, A, triangle.flag},
+        {TriangleKind::Border, C, D, A, triangle.flag}};
   }
   throw std::runtime_error("I miss something it should not happen");
 }

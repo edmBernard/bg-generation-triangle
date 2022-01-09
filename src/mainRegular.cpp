@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) try {
     const float phi2 = (2 * i + sign) * pi / 6 + (angle == 0 ? 0 : pi / angle);
 
     tiling.emplace_back(
-        TriangleKind::kBorder,
+        TriangleKind::Border,
         radius * Point(cos(phi1), sin(phi1)) + center,
         Point(0, 0) + center,
         radius * Point(cos(phi2), sin(phi2)) + center);

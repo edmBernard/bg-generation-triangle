@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) try {
   const Point center = canvasSize / 2.f * Point(1, 1);
 
   // Tiling initialisation
-  tiling.emplace_back(TriangleKind::kBorder, radius * Point(1, 0), radius * Point(0, 0), radius * Point(0, 1));
-  tiling.emplace_back(TriangleKind::kBorder, radius * Point(1, 0), radius * Point(1, 1), radius * Point(0, 1));
+  tiling.emplace_back(TriangleKind::Border, radius * Point(1, 0), radius * Point(0, 0), radius * Point(0, 1));
+  tiling.emplace_back(TriangleKind::Border, radius * Point(1, 0), radius * Point(1, 1), radius * Point(0, 1));
 
   for (int l = 0; l < level; ++l) {
     tiling = deflatePleasing(tiling);
