@@ -4,6 +4,10 @@ Small executable that generate fractal triangle pattern and save it in svg.
 
 - Github : [https://github.com/edmBernard/bg-generation-triangle](https://github.com/edmBernard/bg-generation-triangle)
 
+## Generated command
+
+- `bg-generation-triangle-regular` : Regular subdivision of triangles
+- `bg-generation-triangle-pleasing` : Pleasing subdivision based on [this blog](https://tylerxhobbs.com/essays/2017/aesthetically-pleasing-triangle-subdivision)
 
 ## Dependencies
 
@@ -29,8 +33,6 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake
 # on Windows : cmake .. -DCMAKE_TOOLCHAIN_FILE=${env:VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake
 cmake --build . --config Release
 ```
-
-the executable is named `bg-generation-triangle`
 
 ## Disclaimer
 

@@ -95,9 +95,9 @@ int main(int argc, char *argv[]) try {
   }
 
   for (int l = 0; l < level; ++l) {
-    tiling = deflate(tiling);
+    tiling = deflateRegular(tiling);
   }
-  std::vector<ColoredTriangle> smallTiling = deflate(tiling);
+  std::vector<ColoredTriangle> smallTiling = deflateRegular(tiling);
 
   setRandomFlag(tiling);
   setRandomFlag(smallTiling);

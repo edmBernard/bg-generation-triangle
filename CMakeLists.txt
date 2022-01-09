@@ -15,7 +15,6 @@ find_package(fmt CONFIG REQUIRED)
 
 #**************************************************************************************************
 # Include *****************************************************************************************
-# include_directories(${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # get_cmake_property(_variableNames VARIABLES)
@@ -30,18 +29,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_compile_options(/Oy /utf-8)
+  add_compile_options(/Oy /utf-8 /Zc:__cplusplus /DUNICODE /D_UNICODE)
 else()
-  add_compile_options(-fPIC -O3 -fno-omit-frame-pointer)
+  add_compile_options(-fPIC -O3)
 endif()
 
 #**************************************************************************************************
-# Set variable ************************************************************************************
-SET(SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-)
-
-#**************************************************************************************************
 # Make configuration ******************************************************************************
-add_executable(bg-generation-triangle ${SOURCES})
-target_link_libraries(bg-generation-triangle fmt::fmt spdlog::spdlog)
+add_executable(bg-generation-triangle-regular ${CMAKE_CURRENT_SOURCE_DIR}/src/mainRegular.cpp)
+target_link_libraries(bg-generation-triangle-regular fmt::fmt-header-only spdlog::spdlog_header_only cxxopts::cxxopts)
+
+add_executable(bg-generation-triangle-pleasing ${CMAKE_CURRENT_SOURCE_DIR}/src/mainPleasing.cpp)
+target_link_libraries(bg-generation-triangle-pleasing fmt::fmt-header-only spdlog::spdlog_header_only cxxopts::cxxopts)

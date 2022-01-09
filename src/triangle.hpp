@@ -40,7 +40,7 @@ std::string to_string(const ColoredTriangle &triangle) {
   return fmt::format("{}, {}, {}, {}", triangle.kind, to_string(triangle.vertices[0]), to_string(triangle.vertices[1]), to_string(triangle.vertices[2]));
 }
 
-std::vector<ColoredTriangle> deflate(const ColoredTriangle &triangle) {
+std::vector<ColoredTriangle> deflateRegular(const ColoredTriangle &triangle) {
   const Point A = triangle.vertices[0];
   const Point B = triangle.vertices[1];
   const Point C = triangle.vertices[2];
@@ -55,10 +55,60 @@ std::vector<ColoredTriangle> deflate(const ColoredTriangle &triangle) {
       {TriangleKind::kCentral, a, b, c, triangle.flag}};
 }
 
-std::vector<ColoredTriangle> deflate(const std::vector<ColoredTriangle> &triangles) {
+std::vector<ColoredTriangle> deflateRegular(const std::vector<ColoredTriangle> &triangles) {
   std::vector<ColoredTriangle> newList;
   for (const auto &triangle : triangles) {
-    const auto small = deflate(triangle);
+    const auto small = deflateRegular(triangle);
+    std::move(small.begin(), small.end(), std::back_inserter(newList));
+  }
+  return newList;
+}
+
+std::vector<ColoredTriangle> deflatePleasing(const ColoredTriangle &triangle) {
+  const Point A = triangle.vertices[0];
+  const Point B = triangle.vertices[1];
+  const Point C = triangle.vertices[2];
+
+  float AB = norm(B-A);
+  float AC = norm(C-A);
+  float BC = norm(C-B);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution<> distrib(0.5, 0.3);
+  const float ratio = std::clamp<double>(distrib(gen), 0.3, 0.7);
+
+  if (AB >= AC && AB >= BC) {
+    // Point D is at the middle of the biggest edge
+    const Point D = A + ratio * (B - A);
+
+    return std::vector<ColoredTriangle>{
+        {TriangleKind::kBorder, A, D, C, triangle.flag},
+        {TriangleKind::kBorder, B, D, C, triangle.flag}};
+  }
+
+  if (AC >= AB && AC >= BC) {
+    // Point D is at the middle of the biggest edge
+    const Point D = A + ratio * (C - A);
+
+    return std::vector<ColoredTriangle>{
+        {TriangleKind::kBorder, A, D, B, triangle.flag},
+        {TriangleKind::kBorder, C, D, B, triangle.flag}};
+  }
+
+  if (BC >= AB && BC >= AC) {
+    const Point D = B + ratio * (C - B);
+
+    return std::vector<ColoredTriangle>{
+        {TriangleKind::kBorder, B, D, A, triangle.flag},
+        {TriangleKind::kBorder, C, D, A, triangle.flag}};
+  }
+  throw std::runtime_error("I miss something it should not happen");
+}
+
+std::vector<ColoredTriangle> deflatePleasing(const std::vector<ColoredTriangle> &triangles) {
+  std::vector<ColoredTriangle> newList;
+  for (const auto &triangle : triangles) {
+    const auto small = deflatePleasing(triangle);
     std::move(small.begin(), small.end(), std::back_inserter(newList));
   }
   return newList;

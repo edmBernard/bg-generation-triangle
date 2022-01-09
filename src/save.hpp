@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-
 std::vector<svg::Color> getColorPalette(int index) {
   switch (index) {
   case 0:
@@ -60,19 +59,16 @@ std::vector<svg::Color> getColorPalette(int index) {
   };
 };
 
-
 std::vector<svg::Color> getColorPalette(svg::Color colorBegin, svg::Color colorEnd) {
   const svg::Color colorDirection = colorEnd - colorBegin;
   const float directionNorm = norm(colorDirection);
   return {
-    colorBegin,
-    colorBegin + (1/4.) * colorDirection,
-    colorBegin + (2/4.) * colorDirection,
-    colorBegin + (3/4.) * colorDirection,
-    colorEnd
-  };
+      colorBegin,
+      colorBegin + (1 / 4.) * colorDirection,
+      colorBegin + (2 / 4.) * colorDirection,
+      colorBegin + (3 / 4.) * colorDirection,
+      colorEnd};
 };
-
 
 template <typename Geometry>
 [[nodiscard]] bool saveTiling(const std::string &filename,
@@ -110,6 +106,25 @@ template <typename Geometry>
   if (haveStrokes) {
     const float strokeWidth = norm(bigGeometry[0].vertices[0] - bigGeometry[0].vertices[1]) / 20.0f;
     doc.addPath(bigGeometry, {}, svg::Stroke{{0, 0, 0}, strokeWidth});
+  }
+
+  return doc.save(filename);
+}
+
+
+template <typename Geometry>
+[[nodiscard]] bool saveTiling(const std::string &filename,
+                              const std::vector<Geometry> &geometries,
+                              int canvasSize,
+                              std::optional<svg::Color> color, bool haveStrokes) {
+
+  svg::Document doc(canvasSize, canvasSize, 0xF5ECDC);
+
+  if (color)
+    doc.addPath(geometries, svg::Fill{color.value()}, {});
+
+  if (haveStrokes) {
+    doc.addPath(geometries, {}, svg::Stroke{0x000E36, 1});
   }
 
   return doc.save(filename);
