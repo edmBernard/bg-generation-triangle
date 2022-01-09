@@ -47,8 +47,10 @@ jobs:
       run: cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=Artifact
     - name: build
       run: cmake --build . --config Release
-    - name: run triangle
-      run: ./Artifact/bg-generation-triangle Artifact/red_triangle.svg 6 3 --strokes --angle 6 --threshold 5
+    - name: run triangle regular
+      run: ./Artifact/bg-generation-triangle-regular Artifact/red_triangle.svg 6 3 --strokes --angle 6 --threshold 5
+    - name: run triangle pleasing
+      run: ./Artifact/bg-generation-triangle-pleasing Artifact/gray.svg 14 3 --strokes
     - uses: actions/upload-artifact@v1
       with:
         name: bg-generation-triangle-${{ matrix.config.triplet }}
