@@ -130,8 +130,8 @@ public:
   }
 
 
-  template <typename T, typename Lambda = std::function<bool(T::value_type)>>
-  void addPath(const T &shapes, std::optional<Fill> fill, std::optional<Stroke> stroke, Lambda func = [](const T::value_type &) { return true; }) {
+  template <typename T, typename Lambda = std::function<bool(typename T::value_type)>>
+  void addPath(const T &shapes, std::optional<Fill> fill, std::optional<Stroke> stroke, Lambda func = [](const typename T::value_type &) { return true; }) {
     std::string s_path;
     for (auto &elem : shapes) {
       if (func(elem)) {
